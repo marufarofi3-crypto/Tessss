@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelas XI-1 Astronomi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darknavy: '#0F172A',
+                        skyblue: '#38BDF8',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F172A;
+            color: white;
+            min-height: 100vh;
+        }
+        
+        /* Animasi bintang */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle linear infinite;
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        /* Animasi fade-in */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Transisi halaman */
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* Hover effect untuk tombol */
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-darknavy min-h-screen flex flex-col">
+    <!-- Background bintang -->
+    <div class="stars" id="stars"></div>
+    
+    <!-- Navbar -->
+    <nav class="bg-darknavy bg-opacity-80 backdrop-blur-lg sticky top-0 z-50 border-b border-skyblue border-opacity-20">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <a href="#" class="text-xl font-bold text-skyblue flex items-center" data-page="home">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+                    </svg>
+                    Kelas XI-1 Astronomi
+                </a>
+                
+                <!-- Menu untuk desktop -->
+                <div class="hidden md:flex space-x-6">
+                    <a href="#" class="text-white hover:text-skyblue transition-colors" data-page="home">Home</a>
+                    <a href="#" class="text-white hover:text-skyblue transition-colors" data-page="structure">Struktur Kelas</a>
+                    <a href="#" class="text-white hover:text-skyblue transition-colors" data-page="schedule">Jadwal Pelajaran</a>
+                    <a href="#" class="text-white hover:text-skyblue transition-colors" data-page="duty">Jadwal Piket</a>
+                    <a href="#" class="text-white hover:text-skyblue transition-colors" data-page="announcement">Pengumuman</a>
+                    <a href="#" class="text-white hover:text-skyblue transition-colors" data-page="contact">Kontak</a>
+                </div>
+                
+                <!-- Toggle dark mode -->
+                <button id="theme-toggle" class="p-2 rounded-full bg-darknavy border border-skyblue border-opacity-30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-skyblue" fill="none" viewBox="0 0 24 24" stroke="currentColor" id="theme-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </button>
+                
+                <!-- Menu mobile button -->
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-full bg-darknavy border border-skyblue border-opacity-30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-skyblue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Menu mobile -->
+            <div id="mobile-menu" class="hidden pb-4 md:hidden">
+                <div class="flex flex-col space-y-3">
+                    <a href="#" class="text-white hover:text-skyblue transition-colors" data-page="home">Home</a>
+                    <a href="#" class="text-white hover:text-skyblue transition-colors" data-page="structure">Struktur Kelas</a>
+                    <a href="#" class="text-white hover:text-skyblue transition-colors" data-page="schedule">Jadwal Pelajaran</a>
+                    <a href="#" class="text-white hover:text-skyblue transition-colors" data-page="duty">Jadwal Piket</a>
+                    <a href="#" class="text-white hover:text-skyblue transition-colors" data-page="announcement">Pengumuman</a>
+                    <a href="#" class="text-white hover:text-skyblue transition-colors" data-page="contact">Kontak</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- Halaman Home -->
+        <div id="home" class="page active">
+            <div class="text-center py-12">
+                <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">Kelas XI-1 Astronomi</h1>
+                <p class="text-xl text-skyblue mb-10">Menggapai bintang dengan ilmu dan prestasi</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <a href="#" data-page="structure" class="bg-darknavy bg-opacity-70 border border-skyblue border-opacity-20 rounded-xl p-6 text-center btn-hover">
+                        <div class="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-skyblue bg-opacity-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-skyblue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-2">Struktur Kelas</h3>
+                        <p class="text-gray-300">Lihat susunan pengurus dan anggota kelas</p>
+                    </a>
+                    
+                    <a href="#" data-page="schedule" class="bg-darknavy bg-opacity-70 border border-skyblue border-opacity-20 rounded-xl p-6 text-center btn-hover">
+                        <div class="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-skyblue bg-opacity-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-skyblue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-2">Jadwal Pelajaran</h3>
+                        <p class="text-gray-300">Cek jadwal pelajaran harian</p>
+                    </a>
+                    
+                    <a href="#" data-page="duty" class="bg-darknavy bg-opacity-70 border border-skyblue border-opacity-20 rounded-xl p-6 text-center btn-hover">
+                        <div class="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-skyblue bg-opacity-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-skyblue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-2">Jadwal Piket</h3>
+                        <p class="text-gray-300">Lihat dan centang tugas piket</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Halaman Struktur Kelas -->
+        <div id="structure" class="page">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center">Struktur Kelas XI-1 Astronomi</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Kartu profil akan diisi oleh JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Halaman Jadwal Pelajaran -->
+        <div id="schedule" class="page">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center">Jadwal Pelajaran</h2>
+            
+            <div class="bg-darknavy bg-opacity-70 border border-skyblue border-opacity-20 rounded-xl p-6 mb-8">
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button class="day-btn px-4 py-2 bg-skyblue bg-opacity-10 text-skyblue rounded-lg hover:bg-skyblue hover:text-white transition-colors" data-day="senin">Senin</button>
+                    <button class="day-btn px-4 py-2 bg-skyblue bg-opacity-10 text-skyblue rounded-lg hover:bg-skyblue hover:text-white transition-colors" data-day="selasa">Selasa</button>
+                    <button class="day-btn px-4 py-2 bg-skyblue bg-opacity-10 text-skyblue rounded-lg hover:bg-skyblue hover:text-white transition-colors" data-day="rabu">Rabu</button>
+                    <button class="day-btn px-4 py-2 bg-skyblue bg-opacity-10 text-skyblue rounded-lg hover:bg-skyblue hover:text-white transition-colors" data-day="kamis">Kamis</button>
+                    <button class="day-btn px-4 py-2 bg-skyblue bg-opacity-10 text-skyblue rounded-lg hover:bg-skyblue hover:text-white transition-colors" data-day="jumat">Jumat</button>
+                </div>
+                
+                <div id="schedule-content">
+                    <!-- Konten jadwal akan diisi oleh JavaScript -->
+                    <p class="text-center text-gray-400">Pilih hari untuk melihat jadwal pelajaran</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Halaman Jadwal Piket -->
+        <div id="duty" class="page">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center">Jadwal Piket</h2>
+            
+            <div class="bg-darknavy bg-opacity-70 border border-skyblue border-opacity-20 rounded-xl p-6 mb-8">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="border-b border-skyblue border-opacity-20">
+                                <th class="px-4 py-3 text-left text-skyblue">Hari</th>
+                                <th class="px-4 py-3 text-left text-skyblue">Nama Siswa</th>
+                                <th class="px-4 py-3 text-left text-skyblue">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="duty-list">
+                            <!-- Daftar piket akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Halaman Pengumuman -->
+        <div id="announcement" class="page">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center">Pengumuman</h2>
+            
+            <div class="text-right mb-6">
+                <button id="add-announcement-btn" class="px-4 py-2 bg-skyblue text-white rounded-lg hover:bg-blue-500 transition-colors flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Tambah Pengumuman
+                </button>
+            </div>
+            
+            <div id="announcement-list" class="space-y-6">
+                <!-- Daftar pengumuman akan diisi oleh JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Halaman Kontak -->
+        <div id="contact" class="page">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center">Kontak</h2>
+            
+            <div class="max-w-lg mx-auto bg-darknavy bg-opacity-70 border border-skyblue border-opacity-20 rounded-xl p-6">
+                <form id="contact-form">
+                    <div class="mb-4">
+                        <label for="name" class="block text-gray-300 mb-2">Nama</label>
+                        <input type="text" id="name" class="w-full px-4 py-2 bg-darknavy border border-skyblue border-opacity-30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-skyblue" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="message" class="block text-gray-300 mb-2">Pesan</label>
+                        <textarea id="message" rows="5" class="w-full px-4 py-2 bg-darknavy border border-skyblue border-opacity-30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-skyblue" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="w-full px-4 py-2 bg-skyblue text-white rounded-lg hover:bg-blue-500 transition-colors">Kirim Pesan</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-darknavy bg-opacity-80 border-t border-skyblue border-opacity-20 py-6 mt-8">
+        <div class="container mx-auto px-4 text-center text-gray-400">
+            <p>&copy; 2023 Kelas XI-1 Astronomi. Semua hak dilindungi.</p>
+        </div>
+    </footer>
+    
+    <!-- Modal untuk tambah pengumuman -->
+    <div id="announcement-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
+        <div class="bg-darknavy border border-skyblue border-opacity-30 rounded-xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-xl font-semibold text-white mb-4">Tambah Pengumuman Baru</h3>
+            
+            <form id="announcement-form">
+                <div class="mb-4">
+                    <label for="announcement-title" class="block text-gray-300 mb-2">Judul</label>
+                    <input type="text" id="announcement-title" class="w-full px-4 py-2 bg-darknavy border border-skyblue border-opacity-30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-skyblue" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="announcement-content" class="block text-gray-300 mb-2">Isi Pengumuman</label>
+                    <textarea id="announcement-content" rows="4" class="w-full px-4 py-2 bg-darknavy border border-skyblue border-opacity-30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-skyblue" required></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancel-announcement" class="px-4 py-2 border border-skyblue border-opacity-30 text-skyblue rounded-lg hover:bg-skyblue hover:bg-opacity-10 transition-colors">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-skyblue text-white rounded-lg hover:bg-blue-500 transition-colors">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Data untuk struktur kelas
+        const classStructure = [
+            { name: "Ahmad Rizki", position: "Ketua Kelas", photo: "https://randomuser.me/api/portraits/men/32.jpg" },
+            { name: "Siti Nurhaliza", position: "Wakil Ketua", photo: "https://randomuser.me/api/portraits/women/44.jpg" },
+            { name: "Budi Santoso", position: "Sekretaris", photo: "https://randomuser.me/api/portraits/men/22.jpg" },
+            { name: "Dewi Anggraini", position: "Bendahara", photo: "https://randomuser.me/api/portraits/women/65.jpg" },
+            { name: "Rizky Pratama", position: "Ketua Piket", photo: "https://randomuser.me/api/portraits/men/76.jpg" },
+            { name: "Maya Sari", position: "Anggota", photo: "https://randomuser.me/api/portraits/women/23.jpg" },
+            { name: "Joko Widodo", position: "Anggota", photo: "https://randomuser.me/api/portraits/men/12.jpg" },
+            { name: "Anisa Rahma", position: "Anggota", photo: "https://randomuser.me/api/portraits/women/33.jpg" },
+            { name: "Rudi Hartono", position: "Anggota", photo: "https://randomuser.me/api/portraits/men/45.jpg" }
+        ];
+
+        // Data untuk jadwal pelajaran
+        const classSchedule = {
+            senin: [
+                { time: "07:00 - 07:45", subject: "Matematika" },
+                { time: "07:45 - 08:30", subject: "Fisika" },
+                { time: "08:30 - 09:15", subject: "Kimia" },
+                { time: "09:15 - 09:45", subject: "Istirahat" },
+                { time: "09:45 - 10:30", subject: "Biologi" },
+                { time: "10:30 - 11:15", subject: "Bahasa Indonesia" },
+                { time: "11:15 - 12:00", subject: "Sejarah" }
+            ],
+            selasa: [
+                { time: "07:00 - 07:45", subject: "Bahasa Inggris" },
+                { time: "07:45 - 08:30", subject: "Seni Budaya" },
+                { time: "08:30 - 09:15", subject: "PJOK" },
+                { time: "09:15 - 09:45", subject: "Istirahat" },
+                { time: "09:45 - 10:30", subject: "Prakarya" },
+                { time: "10:30 - 11:15", subject: "Informatika" },
+                { time: "11:15 - 12:00", subject: "Bimbingan Konseling" }
+            ],
+            rabu: [
+                { time: "07:00 - 07:45", subject: "Matematika" },
+                { time: "07:45 - 08:30", subject: "Fisika" },
+                { time: "08:30 - 09:15", subject: "Kimia" },
+                { time: "09:15 - 09:45", subject: "Istirahat" },
+                { time: "09:45 - 10:30", subject: "Biologi" },
+                { time: "10:30 - 11:15", subject: "Bahasa Indonesia" },
+                { time: "11:15 - 12:00", subject: "Pendidikan Agama" }
+            ],
+            kamis: [
+                { time: "07:00 - 07:45", subject: "Bahasa Inggris" },
+                { time: "07:45 - 08:30", subject: "PPKn" },
+                { time: "08:30 - 09:15", subject: "Sejarah" },
+                { time: "09:15 - 09:45", subject: "Istirahat" },
+                { time: "09:45 - 10:30", subject: "Ekonomi" },
+                { time: "10:30 - 11:15", subject: "Sosiologi" },
+                { time: "11:15 - 12:00", subject: "Geografi" }
+            ],
+            jumat: [
+                { time: "07:00 - 07:45", subject: "Matematika" },
+                { time: "07:45 - 08:30", subject: "Fisika" },
+                { time: "08:30 - 09:15", subject: "Kimia" },
+                { time: "09:15 - 09:30", subject: "Istirahat" },
+                { time: "09:30 - 10:15", subject: "Biologi" },
+                { time: "10:15 - 11:00", subject: "Bahasa Indonesia" }
+            ]
+        };
+
+        // Data untuk jadwal piket
+        const dutySchedule = [
+            { day: "Senin", students: ["Ahmad Rizki", "Siti Nurhaliza", "Budi Santoso"] },
+            { day: "Selasa", students: ["Dewi Anggraini", "Rizky Pratama", "Maya Sari"] },
+            { day: "Rabu", students: ["Joko Widodo", "Anisa Rahma", "Rudi Hartono"] },
+            { day: "Kamis", students: ["Ahmad Rizki", "Siti Nurhaliza", "Budi Santoso"] },
+            { day: "Jumat", students: ["Dewi Anggraini", "Rizky Pratama", "Maya Sari"] }
+        ];
+
+        // Fungsi untuk membuat animasi bintang
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starsCount = 150;
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Ukuran acak antara 1-3px
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Posisi acak
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Durasi animasi acak antara 3-8 detik
+                const duration = Math.random() * 5 + 3;
+                star.style.animationDuration = `${duration}s`;
+                
+                // Delay acak
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Fungsi untuk navigasi antar halaman
+        function setupNavigation() {
+            const navLinks = document.querySelectorAll('a[data-page]');
+            const pages = document.querySelectorAll('.page');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetPage = link.getAttribute('data-page');
+                    
+                    // Sembunyikan semua halaman
+                    pages.forEach(page => {
+                        page.classList.remove('active');
+                    });
+                    
+                    // Tampilkan halaman target
+                    document.getElementById(targetPage).classList.add('active');
+                    
+                    // Tutup menu mobile jika terbuka
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                    
+                    // Scroll ke atas
+                    window.scrollTo(0, 0);
+                });
+            });
+        }
+
+        // Fungsi untuk toggle dark/light mode
+        function setupThemeToggle() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            // Cek preferensi sistem atau local storage
+            if (localStorage.getItem('theme') === 'light' || 
+                (!localStorage.getItem('theme') && !prefersDarkScheme.matches)) {
+                document.documentElement.classList.remove('dark');
+                themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />';
+            } else {
+                document.documentElement.classList.add('dark');
+                themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />';
+            }
+            
+            themeToggle.addEventListener('click', () => {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                    themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />';
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                    themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />';
+                }
+            });
+        }
+
+        // Fungsi untuk toggle menu mobile
+        function setupMobileMenu() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Fungsi untuk menampilkan struktur kelas
+        function renderClassStructure() {
+            const structureContainer = document.querySelector('#structure .grid');
+            
+            classStructure.forEach(member => {
+                const card = document.createElement('div');
+                card.classList.add('fade-in', 'bg-darknavy', 'bg-opacity-70', 'border', 'border-skyblue', 'border-opacity-20', 'rounded-xl', 'p-6', 'text-center');
+                
+                card.innerHTML = `
+                    <img src="${member.photo}" alt="${member.name}" class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-skyblue border-opacity-30">
+                    <h3 class="text-xl font-semibold text-white mb-2">${member.name}</h3>
+                    <p class="text-skyblue">${member.position}</p>
+                `;
+                
+                structureContainer.appendChild(card);
+            });
+            
+            // Trigger animasi fade-in
+            setTimeout(() => {
+                document.querySelectorAll('.fade-in').forEach(el => {
+                    el.classList.add('visible');
+                });
+            }, 100);
+        }
+
+        // Fungsi untuk menampilkan jadwal pelajaran
+        function setupClassSchedule() {
+            const dayButtons = document.querySelectorAll('.day-btn');
+            const scheduleContent = document.getElementById('schedule-content');
+            
+            dayButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const day = button.getAttribute('data-day');
+                    
+                    // Hapus kelas aktif dari semua tombol
+                    dayButtons.forEach(btn => {
+                        btn.classList.remove('bg-skyblue', 'text-white');
+                        btn.classList.add('bg-skyblue', 'bg-opacity-10', 'text-skyblue');
+                    });
+                    
+                    // Tambahkan kelas aktif ke tombol yang diklik
+                    button.classList.remove('bg-skyblue', 'bg-opacity-10', 'text-skyblue');
+                    button.classList.add('bg-skyblue', 'text-white');
+                    
+                    // Tampilkan jadwal untuk hari yang dipilih
+                    let scheduleHTML = `
+                        <h3 class="text-xl font-semibold text-white mb-4 capitalize">Jadwal Pelajaran ${day}</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr class="border-b border-skyblue border-opacity-20">
+                                        <th class="px-4 py-3 text-left text-skyblue">Waktu</th>
+                                        <th class="px-4 py-3 text-left text-skyblue">Mata Pelajaran</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    
+                    classSchedule[day].forEach(item => {
+                        scheduleHTML += `
+                            <tr class="border-b border-skyblue border-opacity-10">
+                                <td class="px-4 py-3 text-white">${item.time}</td>
+                                <td class="px-4 py-3 text-white">${item.subject}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    scheduleHTML += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    
+                    scheduleContent.innerHTML = scheduleHTML;
+                });
+            });
+        }
+        // Fungsi untuk menampilkan jadwal piket
+        function renderDutySchedule() {
+            const dutyList = document.getElementById('duty-list');
+            
+            dutySchedule.forEach(daySchedule => {
+                daySchedule.students.forEach((student, index) => {
+                    const row = document.createElement('tr');
+                    row.classList.add('border-b', 'border-skyblue', 'border-opacity-10');
+                    
+                    if (index === 0) {
+                        row.innerHTML = `
+                            <td class="px-4 py-3 text-white align-top" rowspan="${daySchedule.students.length}">${daySchedule.day}</td>
+                            <td class="px-4 py-3 text-white">${student}</td>
+                            <td class="px-4 py-3">
+                                <input type="checkbox" class="duty-checkbox" data-day="${daySchedule.day.toLowerCase()}" data-student="${student}" />
+                            </td>
+                        `;
+                    } else {
+                        row.innerHTML = `
+                            <td class="px-4 py-3 text-white">${student}</td>
+                            <td class="px-4 py-3">
+                                <input type="checkbox" class="duty-checkbox" data-day="${daySchedule.day.toLowerCase()}" data-student="${student}" />
+                            </td>
+                        `;
+                    }
+                    
+                    dutyList.appendChild(row);
+                });
+            });
+            
+            // Load status piket dari localStorage
+            document.querySelectorAll('.duty-checkbox').forEach(checkbox => {
+                const day = checkbox.getAttribute('data-day');
+                const student = checkbox.getAttribute('data-student');
+                const key = `duty-${day}-${student}`;
+                
+                if (localStorage.getItem(key) === 'completed') {
+                    checkbox.checked = true;
+                }
+                
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
+                        localStorage.setItem(key, 'completed');
+                    } else {
+                        localStorage.setItem(key, 'incomplete');
+                    }
+                });
+            });
+        }
+
+        // Fungsi untuk menampilkan pengumuman
+        function renderAnnouncements() {
+            const announcementList = document.getElementById('announcement-list');
+            const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+            
+            if (announcements.length === 0) {
+                announcementList.innerHTML = '<p class="text-center text-gray-400">Belum ada pengumuman</p>';
+                return;
+            }
+            
+            announcementList.innerHTML = '';
+            announcements.forEach((announcement, index) => {
+                const announcementEl = document.createElement('div');
+                announcementEl.classList.add('bg-darknavy', 'bg-opacity-70', 'border', 'border-skyblue', 'border-opacity-20', 'rounded-xl', 'p-6');
+                
+                announcementEl.innerHTML = `
+                    <h3 class="text-xl font-semibold text-white mb-2">${announcement.title}</h3>
+                    <p class="text-gray-300 mb-4">${announcement.content}</p>
+                    <div class="text-right text-sm text-gray-400">${new Date(announcement.date).toLocaleDateString('id-ID')}</div>
+                    <button class="delete-announcement mt-2 text-red-500 text-sm" data-index="${index}">Hapus</button>
+                `;
+                
+                announcementList.appendChild(announcementEl);
+            });
+            
+            // Tambahkan event listener untuk tombol hapus
+            document.querySelectorAll('.delete-announcement').forEach(button => {
+                button.addEventListener('click', () => {
+                    const index = parseInt(button.getAttribute('data-index'));
+                    deleteAnnouncement(index);
+                });
+            });
+        }
+
+        // Fungsi untuk menambah pengumuman
+        function setupAnnouncementForm() {
+            const addButton = document.getElementById('add-announcement-btn');
+            const modal = document.getElementById('announcement-modal');
+            const cancelButton = document.getElementById('cancel-announcement');
+            const form = document.getElementById('announcement-form');
+            
+            addButton.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+            });
+            
+            cancelButton.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                form.reset();
+            });
+            
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const title = document.getElementById('announcement-title').value;
+                const content = document.getElementById('announcement-content').value;
+                
+                if (title && content) {
+                    const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+                    announcements.unshift({
+                        title,
+                        content,
+                        date: new Date().toISOString()
+                    });
+                    
+                    localStorage.setItem('announcements', JSON.stringify(announcements));
+                    
+                    modal.classList.add('hidden');
+                    form.reset();
+                    
+                    renderAnnouncements();
+                    
+                    // Tampilkan notifikasi
+                    if (Notification.permission === 'granted') {
+                        new Notification('Pengumuman Baru', {
+                            body: title,
+                            icon: 'https://example.com/icon.png'
+                        });
+                    }
+                }
+            });
+        }
+
+        // Fungsi untuk menghapus pengumuman
+        function deleteAnnouncement(index) {
+            const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+            announcements.splice(index, 1);
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            renderAnnouncements();
+        }
+
+        // Fungsi untuk setup form kontak
+        function setupContactForm() {
+            const form = document.getElementById('contact-form');
+            
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value;
+                const message = document.getElementById('message').value;
+                
+                if (name && message) {
+                    // Simulasi pengiriman pesan
+                    alert(`Terima kasih ${name}, pesan Anda telah terkirim!`);
+                    form.reset();
+                    
+                    // Notifikasi ke admin (simulasi)
+                    if (Notification.permission === 'granted') {
+                        new Notification('Pesan Baru', {
+                            body: `Anda memiliki pesan dari ${name}`,
+                            icon: 'https://example.com/icon.png'
+                        });
+                    }
+                }
+            });
+        }
+
+        // Fungsi untuk meminta izin notifikasi
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        // Inisialisasi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            setupNavigation();
+            setupThemeToggle();
+            setupMobileMenu();
+            renderClassStructure();
+            setupClassSchedule();
+            renderDutySchedule();
+            renderAnnouncements();
+            setupAnnouncementForm();
+            setupContactForm();
+            requestNotificationPermission();
+        });
+    </script>
+</body>
+</html>// Fungsi untuk menampilkan jadwal piket
+        function renderDutySchedule() {
+            const dutyList = document.getElementById('duty-list');
+            
+            dutySchedule.forEach(daySchedule => {
+                daySchedule.students.forEach((student, index) => {
+                    const row = document.createElement('tr');
+                    row.classList.add('border-b', 'border-skyblue', 'border-opacity-10');
+                    
+                    if (index === 0) {
+                        row.innerHTML = `
+                            <td class="px-4 py-3 text-white align-top" rowspan="${daySchedule.students.length}">${daySchedule.day}</td>
+                            <td class="px-4 py-3 text-white">${student}</td>
+                            <td class="px-4 py-3">
+                                <input type="checkbox" class="duty-checkbox" data-day="${daySchedule.day.toLowerCase()}" data-student="${student}" />
+                            </td>
+                        `;
+                    } else {
+                        row.innerHTML = `
+                            <td class="px-4 py-3 text-white">${student}</td>
+                            <td class="px-4 py-3">
+                                <input type="checkbox" class="duty-checkbox" data-day="${daySchedule.day.toLowerCase()}" data-student="${student}" />
+                            </td>
+                        `;
+                    }
+                    
+                    dutyList.appendChild(row);
+                });
+            });
+            
+            // Load status piket dari localStorage
+            document.querySelectorAll('.duty-checkbox').forEach(checkbox => {
+                const day = checkbox.getAttribute('data-day');
+                const student = checkbox.getAttribute('data-student');
+                const key = `duty-${day}-${student}`;
+                
+                if (localStorage.getItem(key) === 'completed') {
+                    checkbox.checked = true;
+                }
+                
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
+                        localStorage.setItem(key, 'completed');
+                    } else {
+                        localStorage.setItem(key, 'incomplete');
+                    }
+                });
+            });
+        }
+
+        // Fungsi untuk menampilkan pengumuman
+        function renderAnnouncements() {
+            const announcementList = document.getElementById('announcement-list');
+            const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+            
+            if (announcements.length === 0) {
+                announcementList.innerHTML = '<p class="text-center text-gray-400">Belum ada pengumuman</p>';
+                return;
+            }
+            
+            announcementList.innerHTML = '';
+            announcements.forEach((announcement, index) => {
+                const announcementEl = document.createElement('div');
+                announcementEl.classList.add('bg-darknavy', 'bg-opacity-70', 'border', 'border-skyblue', 'border-opacity-20', 'rounded-xl', 'p-6');
+                
+                announcementEl.innerHTML = `
+                    <h3 class="text-xl font-semibold text-white mb-2">${announcement.title}</h3>
+                    <p class="text-gray-300 mb-4">${announcement.content}</p>
+                    <div class="text-right text-sm text-gray-400">${new Date(announcement.date).toLocaleDateString('id-ID')}</div>
+                    <button class="delete-announcement mt-2 text-red-500 text-sm" data-index="${index}">Hapus</button>
+                `;
+                
+                announcementList.appendChild(announcementEl);
+            });
+            
+            // Tambahkan event listener untuk tombol hapus
+            document.querySelectorAll('.delete-announcement').forEach(button => {
+                button.addEventListener('click', () => {
+                    const index = parseInt(button.getAttribute('data-index'));
+                    deleteAnnouncement(index);
+                });
+            });
+        }
+
+        // Fungsi untuk menambah pengumuman
+        function setupAnnouncementForm() {
+            const addButton = document.getElementById('add-announcement-btn');
+            const modal = document.getElementById('announcement-modal');
+            const cancelButton = document.getElementById('cancel-announcement');
+            const form = document.getElementById('announcement-form');
+            
+            addButton.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+            });
+            
+            cancelButton.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                form.reset();
+            });
+            
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const title = document.getElementById('announcement-title').value;
+                const content = document.getElementById('announcement-content').value;
+                
+                if (title && content) {
+                    const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+                    announcements.unshift({
+                        title,
+                        content,
+                        date: new Date().toISOString()
+                    });
+                    
+                    localStorage.setItem('announcements', JSON.stringify(announcements));
+                    
+                    modal.classList.add('hidden');
+                    form.reset();
+                    
+                    renderAnnouncements();
+                    
+                    // Tampilkan notifikasi
+                    if (Notification.permission === 'granted') {
+                        new Notification('Pengumuman Baru', {
+                            body: title,
+                            icon: 'https://example.com/icon.png'
+                        });
+                    }
+                }
+            });
+        }
+
+        // Fungsi untuk menghapus pengumuman
+        function deleteAnnouncement(index) {
+            const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+            announcements.splice(index, 1);
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            renderAnnouncements();
+        }
+
+        // Fungsi untuk setup form kontak
+        function setupContactForm() {
+            const form = document.getElementById('contact-form');
+            
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value;
+                const message = document.getElementById('message').value;
+                
+                if (name && message) {
+                    // Simulasi pengiriman pesan
+                    alert(`Terima kasih ${name}, pesan Anda telah terkirim!`);
+                    form.reset();
+                    
+                    // Notifikasi ke admin (simulasi)
+                    if (Notification.permission === 'granted') {
+                        new Notification('Pesan Baru', {
+                            body: `Anda memiliki pesan dari ${name}`,
+                            icon: 'https://example.com/icon.png'
+                        });
+                    }
+                }
+            });
+        }
+
+        // Fungsi untuk meminta izin notifikasi
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        // Inisialisasi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            setupNavigation();
+            setupThemeToggle();
+            setupMobileMenu();
+            renderClassStructure();
+            setupClassSchedule();
+            renderDutySchedule();
+            renderAnnouncements();
+            setupAnnouncementForm();
+            setupContactForm();
+            requestNotificationPermission();
+        });
+    </script>
+</body>
+</html>
